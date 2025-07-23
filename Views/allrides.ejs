@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+   <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+    <main>
+        <div class="contanier">
+     <h1>Available Rides</h1>
+      <ul>
+        <% rides.forEach(ride => { %>
+    <li class="ride-item">
+         <a href="/ride/<%=ride.location %>-<%= ride.destination %>" style="text-decoration: none; color: inherit;">
+        <strong><%= ride.location %> =><%= ride.destination %><br></strong>
+      </a>
+    </li>
+  <% }); %> 
+</ul>
+    </div>
+    </main>
+</body>
+</html>
+
+

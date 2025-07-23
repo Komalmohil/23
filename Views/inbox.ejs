@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Document</title>
+</head>
+<body>
+  <%- include("partials/header") %>
+
+  <div id="chat-container">
+    <div id="messages">
+      <% messages.forEach(msg => { %>
+        <div class="msgs">
+          <%= msg.text %>
+        </div>
+      <% })%>
+    </div>
+   <form id="form">
+  <input id="msg" autocomplete="off" /><button>Send</button>
+</form>
+
+<p>room id<%=roomId%><br>receiver <%= receiverId %><br>sender<%= senderId %> <br><%= rideId %></p>
+
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket= io();
+  const room="<%=roomId%>"; 
+  const receiverId ="<%= receiverId %>"; 
+  const rideId="<%=rideId %>";
+  const senderId="<%= senderId %>"; 
+
+  socket.on("connect", () => {
+    console.log("Socket connected in FE",socket.id);  
+    socket.emit("registerUser",senderId);
+    socket.emit("joinRoom",room);
+  });
+
+  const form= document.getElementById("form");
+  const input=document.getElementById("msg");
+  const messagesDiv=document.getElementById("messages");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const msg=input.value.trim();
+    if (msg&&senderId &&receiverId&&rideId) {
+      socket.emit("sendMessage", {text:msg ,sender:senderId,receiver:receiverId,rideId});
+      input.value= "";
+    }
+  });
+
+  socket.on("newMessage", (message) => {
+ // console.log("New message received:",message);
+  const msgDiv=document.createElement("div");
+  msgDiv.classList.add("msgs");
+  msgDiv.textContent = message.text;
+  messagesDiv.appendChild(msgDiv);
+});
+
+</script>
+
+</body>
+</html>

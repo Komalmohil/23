@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ride Booking</title>
+  <link rel="stylesheet" href="/css/homestyle.css" />
+</head>
+<body>
+<%- include('partials/header.ejs')%> 
+
+  <section id="first">
+    <img id="one" src="/img/cars.jpg">
+    <h1>Your pick of rides at low prices</h1>
+  </section>
+
+  <%- include("partials/searchbar.ejs")%>
+
+  <div id="card">
+    <div class="card">
+      <h4>Your pick of rides at low prices</h4>
+      <p>No matter where you're going, by bus or carpool, find the perfect ride from our wide range of destinations and routes at low prices.</p>
+    </div>
+    <div class="card">
+      <h4>Trust who you travel with</h4>
+      <p>We take the time to get to know each of our members and bus partners. We check reviews, profiles, and IDs, so you know who you’re travelling with and can book your ride at ease on our secure platform.</p>
+    </div>
+    <div class="card">
+      <h4>Scroll, click, tap and go!</h4>
+      <p>Booking a ride has never been easier! Thanks to our simple app powered by great technology, you can book a ride close to you in just minutes.</p>
+    </div>
+  </div>
+
+<div id="lookup">
+  <img src="/img/lookup.jpg" alt="lookup">
+  <div id="right">
+    <h4>Help us keep you safe from scams</h4>
+    <p>At BlaBlaCar, we're working hard to make our platform as secure as it can be. But when scams do happen, we want you to know exactly how to avoid and report them. Follow our tips to help us keep you safe.</p>
+  <button>Learn More</button>
+  </div>
+</div>
+
+<div id="offer">
+  <div id="left">
+  <h4>Driving in your car soon?</h4>
+  <p>Let's make this your least expensive journey ever.</p>
+  <button id="offerbtn">Offer a ride</button></div>
+    <img id="driver" src="/img/driver.jpg">
+</div>
+<div id="offer">
+  <div id="left">
+  <h4>Getting rides</h4>
+  <button><a href="/get-rides">See all rides</a></button></div>
+    <img id="driver" src="/img/driver.jpg">
+</div>
+
+</body>
+<script>
+  const offer=document.getElementById("offerbtn");
+  offer.addEventListener("click",()=>{
+    window.location.href = "/publish";  
+  });
+</script>
+</html>

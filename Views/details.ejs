@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+   <link rel="stylesheet" href="/css/bookingstyle.css"> 
+</head>
+<body>
+    <%- include('partials/header.ejs') %>
+<main>
+  <div class="container" id="bookdiv">
+  <h2> <%= ride.date %></h2>
+  <div class="details" id="locdest">
+          <h3>From: <%=ride.location%></h3>
+          <p>Pickup: <%= ride.pickupPoint%></p>
+          <p>At: <%= ride.pickupTime%></p>
+        <h3>To: <%=ride.destination %></h3>
+        <p>Drop-off: <%=ride.dropoffPoint %></p>
+  </div>
+  <div class="details" id="noCost"> 
+    <p><%= ride.seats %> passenger</p>
+    <p>Price: ₹<%= ride.price %></p>
+  </div>
+    <button type="button" id="book" onclick="showInput('<%= ride._id %>')">Book Ride</button>
+</div>
+    <div id="namebox" style="display:none;">
+      <h2>Route: <%= ride.location %> - <%= ride.destination %></h2>
+
+        <form id="bookingForm" onsubmit="submitForm(event)">
+    <input type="hidden" name="rideId" value="<%= ride._id %>">
+            <div class="select-group">
+                <h2>Booking for:</h2>
+                <select name="bookingFor" id="bookingFor" onchange="toggleForm()">
+                    <option value="">Choose one</option>
+                    <option value="myself">Myself</option>
+                    <option value="other">Someone else</option>
+                </select>
+
+                <div id="myselfForm" style="display: none;">
+                    <input type="text" value="<%= username||'' %>" name="passengerName" placeholder="Your name">
+                    <input type="number" name="passengersNo" max="<%=ride.seats%>" placeholder="Number of passengers">
+                    <input type="tel" name="phoneNumber" pattern="[0-9]{10}" placeholder="Your contact number">
+                </div>
+
+                <div id="otherForm" style="display: none;">
+                    <input type="text" name="otherPassengerName" placeholder="Passenger name">
+                    <input type="email" name="passengerEmail" placeholder="Passenger email">
+                    <input type="number" name="no" placeholder="Number of passengers">
+                    <input type="tel" name="phoneNo" pattern="[0-9]{10}" placeholder="Passenger contact number">
+                </div>
+            </div>
+            <button type="submit" id="confirm">Confirm Booking</button>
+            <div id="responseMessage" style="margin-top: 1em;"></div>
+        </form>
+    </div>
+</div>
+
+<script>
+const username = "<%= username||'' %>";
+function showInput(){
+    document.getElementById("namebox").style.display='block';
+    document.getElementById("bookdiv").style.display='none';
+}
+
+
+function toggleForm() {
+  const bookingFor =document.querySelector('select[name="bookingFor"]').value;
+  const myselfForm=document.getElementById("myselfForm");
+  const otherForm= document.getElementById("otherForm");
+
+  myselfForm.style.display= bookingFor==="myself" ?"block" :"none";
+  otherForm.style.display=bookingFor==="other"?"block":"none";
+
+}
+
+async function submitForm(event) {
+  event.preventDefault();
+  const form= document.getElementById("bookingForm");
+  const errDiv =document.getElementById("responseMessage")
+  const data = {
+    rideId:form.rideId.value,
+    bookingFor:form.bookingFor.value,
+    passengerName: form.passengerName?.value,
+    passengersNo:form.passengersNo?.value,
+    phoneNumber:form.phoneNumber?.value,
+    otherPassengerName: form.otherPassengerName?.value,
+    passengerEmail:form.passengerEmail?.value,
+    phoneNo: form.phoneNo?.value,
+    no:form.no?.value
+  };
+  try{
+    const res= await fetch("/book-ride", {
+      method:"POST",
+      headers:{ "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+    const data=await res.json();
+    errDiv.textContent= data.error || "Something went wrong.";
+    return;
+  }
+  else{ errDiv.textContent="Request sent";}
+  } catch(err){
+    console.error(err);
+    errDiv.textContent="Please login first";
+  }
+}
+</script>
+</body>
+</html>

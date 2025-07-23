@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <main>
+  <div class="container">
+  <h1>Reset Your Password</h1>
+  <form method="POST" action="/reset/<%= token %>">
+  <input type="password" name="pass" placeholder="New Password" required>
+  <input type="password" name="confirmPass" placeholder="Confirm Password" required>
+  <input type="hidden" name="token" value="<%= token %>">
+  <button type="submit">Reset Password</button>
+</form>
+</div>
+</main>
+<!-- <%- include('partials/footer.ejs') %> -->
+</body>
+</html>

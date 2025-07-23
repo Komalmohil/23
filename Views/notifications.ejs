@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <% if (notifications && notifications.length > 0) { %>
+    <% notifications.forEach(n => { %>
+      <div class="notification">
+        <p><%= n.message %></p>
+        <% if (n.rideId) { %>
+          <a class="view-link" href="/ride/<%= n.rideId._id %>/requests">View Ride</a>
+        <% } %>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p>No notifications.</p>
+  <% } %>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  socket.on("connect",()=>{
+    const userId="<%= userId %>"; 
+    if(userId){
+      socket.emit("registerUser", userId);
+    }
+  });
+
+  socket.on("newChatNotification", ({message,rideId,sender,receiver })=>{
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <div style="background-color:#f5f5dc;padding:10px;margin:10px 0;">
+        <strong>${message}</strong><br>
+        <a href="/inbox/${rideId}/${sender}/${receiver}">View Chat</a>
+      </div>
+    `;
+    document.body.appendChild(div);
+  });
+</script>
+
+
+</body>
+</html>

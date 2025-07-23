@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booked Rides</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/profilestyle.css">
+</head>
+<body>
+  <%- include('partials/header.ejs') %>
+
+  <main>
+    <div id="one">
+    <h2>Upcoming Rides</h2>
+    <% if (upcomingRides.length>0){ %>
+      <ul>
+       <% upcomingRides.forEach(booking => { %>
+          <li class="ride-item">
+            <strong><%= booking.rideId.location%> => <%= booking.rideId.destination %></strong><br>
+            Date: <%= booking.rideId.date %><br>
+            <% if (booking.bookingFor === "other"){%>
+              Booked By: <%= booking.username %><br>
+              For: <%= booking.name %> (<%= booking.email %>)
+            <% } %>
+        <a href="/inbox/<%= booking.rideId._id %>/<%= booking.rideId.publisher%>/<%= booking.userId._id%>">Chat with Driver</a>
+           </li>
+        <% }) %>
+      </ul>
+    <%}else{%>
+      <div class="container">
+        <img id="map" src="/img/map.jpg" alt="map">
+        <h1>Your future travel plans will appear here.</h1>
+        <p>Find the perfect ride from thousands of destinations, or publish to share your travel costs.</p>
+    </div>
+    <% } %>
+</div>
+<div id="two">
+  <h2>Past Rides</h2>
+  <% if (pastRides.length>0){%>
+    <ul>
+     <% pastRides.forEach(booking =>{ %>
+  <% if (booking.bookingFor=== "myself") { %>
+    <li class="ride-item">
+      <strong><%= booking.rideId.location%> => <%= booking.rideId.destination%></strong><br>
+      Date: <%=booking.rideId.date %><br>
+      Name: <%=booking.name %><br>
+      <div class="rating" name="<%= booking._id %>">
+        <% for (let i=1;i<=5;i++){ %>
+          <span class="fa fa-star <%= i<=booking.rating ?'checked':'' %>" id="<%=i%>"></span>
+        <% } %>
+      </div>
+    </li>
+  <% } %>
+<% }) %>
+  <% } else { %>
+    <div class="container">
+      <img id="map" src="/img/map.jpg" alt="map">
+      <h1>Your traveled plans will appear here.</h1>
+      <p>Find the perfect ride from thousands of destinations, or publish to share your travel costs.</p>
+    </div>
+  <%}%>
+</div>
+  </main>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+document.querySelectorAll('.rating').forEach(ratingDiv => {
+  const bookingId= ratingDiv.getAttribute('name');
+  const stars = ratingDiv.querySelectorAll('.fa-star');
+
+  stars.forEach((star,i)=>{
+    star.addEventListener('click',async ()=>{
+      const selected=i+1;
+
+      stars.forEach((s,j)=>{
+        s.className= j<selected? 'fa fa-star checked':'fa fa-star';
+      });
+
+      try {
+        await fetch("/rating",{
+          method:"POST",
+          headers:{ "Content-Type": "application/json" },
+          body: JSON.stringify({bookingId,rating:selected })
+        });
+      } catch(err){  console.error(err);  }
+    });
+  });
+});
+
+  const socket = io();
+   socket.on("connect", () => {
+    const userId = "<%= userId %>"; 
+    console.log("user sent")
+    socket.emit("registerUser", userId);
+  });
+</script>
+</body>
+</html>

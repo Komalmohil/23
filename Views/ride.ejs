@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+     <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%-include('partials/header.ejs')%>
+    <main>
+     <div class="container" id="create-ride">
+        <h1>Complete the details for your ride</h1>
+    <form class="ride-form" id="rideForm">
+        <label id="loc">Leaving from</label>
+        <input type="text" id ="loc" name="location" required>
+
+        <label id="des">Going to</label>
+        <input type="text" id="des" name="destination" required>
+
+        <label id="date">Travel Date</label>
+        <input type="date" id="date" name="date" required>
+
+        <label id="pickup">Pickup Point</label>
+        <input type="text" id="pickup" name="pickupPoint" required>
+
+        <label id="time">Pickup Time</label>
+        <input type="time" id="time" name="pickupTime" required>
+
+        <label id="drop">Drop-off Point</label>
+        <input type="text" id="drop" name="dropoffPoint" required>
+
+        <label id="seats">How many passengers can you take?</label>
+        <input type="number" id="seats" name="seats" min="1" required>
+
+        <label id="price">Price per seat (₹)</label>
+        <input type="number" id="price" name="price" required>
+
+        
+       <div class="checkbox-group">
+        <label id="returnTrip"><input type="checkbox" name="returnTrip" id="returnTrip"> Publish return ride as well</label>
+        <label id="returnTripDone"><input type="checkbox" name="returnTripDone" id="returnTripDone"> Published</label>
+        <label id="later"><input type="checkbox" name="later" id="later"> Later</label>
+        </div>
+
+  <button type="submit">Publish Ride</button>
+</form>
+</div>
+    </main>
+</body>
+<script>
+const date=document.getElementById("date")
+const min= new Date().toISOString().slice(0,10)
+date.setAttribute('min',min)
+
+const container=document.getElementById("create-ride")
+const form=document.getElementById("rideForm")
+form.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const data={
+    location: form.location.value,
+    destination: form.destination.value,
+    date: form.date.value,
+    pickupPoint:form.pickupPoint.value,
+    pickupTime:form.pickupTime.value,
+    dropoffPoint:form.dropoffPoint.value,
+    seats:form.seats.value,
+    price: form.price.value,
+    returnTrip:form.returnTrip.checked,
+    returnTripDone:form.returnTripDone.checked,
+    later:form.later.checked,
+  };
+   
+    if(document.getElementById("returnTrip").checked){ data.returnTrip=true;  } 
+    else if(document.getElementById("returnTripDone").checked){data.returnTripDone =true;} 
+    else if(document.getElementById("later").checked){ data.later=true; }
+  try {
+    const response=await fetch("/create-ride", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(data),
+    });
+
+const text=await response.text();
+    if(response.ok){  window.location.href="/search";} 
+    else {
+  const resultDiv=document.createElement("div");
+  resultDiv.textContent =text;
+  container.appendChild(resultDiv);
+}
+  } catch(err){console.error(err);}
+});
+
+
+</script>
+</html>

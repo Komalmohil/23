@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signup</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main>
+    <div id="emailDiv" class="container signup">
+      <h1>Signup</h1>
+      <form id="email-form">
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        <button type="submit">Next</button>
+      </form>
+      <div id="errDiv" style="color:red"></div>
+    </div>
+   <div id="otpDiv" class="container" style="display: none;">
+  <form id="otp-form">
+    <label>Enter OTP sent to your email</label><br>
+    <input type="text" id="otp" placeholder="Enter OTP" required>
+    <button type="submit">Verify OTP</button>
+  </form>
+</div>
+
+    <div id="register" class="container" style="display: none;">
+      <form method="POST" action="/signup">
+        <input type="hidden" name="email" id="reg-email">
+
+        <label>Name:</label>
+        <input type="text" name="name" placeholder="Full Name" required><br>
+
+        <label>Phone number:</label>
+        <input type="tel" name="phone" pattern="[0-9]{10}" placeholder="Phone Number" required><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" placeholder="Password" required><br>
+
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  </main>
+<script>
+const otpDiv= document.getElementById('otpDiv');
+const otpForm=document.getElementById('otp-form');
+const otpInput= document.getElementById('otp');
+let verifiedEmail= null;
+
+const eForm =document.getElementById('email-form');
+const eInp= document.getElementById('email');
+const errDiv=document.getElementById('errDiv');
+const emailDiv= document.getElementById('emailDiv');
+const registerDiv= document.getElementById('register');
+const regEmail=document.getElementById('reg-email');
+
+eForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email=eInp.value;
+  try { const res= await fetch('/check-email', {
+      method:'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({email})
+    });
+    const data=await res.json();
+    if(!res.ok){  errDiv.textContent=data.error || "Something went wrong.";
+      return;
+    }
+    errDiv.textContent= '';
+    verifiedEmail=email;              
+    otpDiv.style.display="block";     
+  } catch(error){
+    console.error(error);
+    errDiv.textContent="Something went wrong. Please try again.";
+  }
+});
+
+otpForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const otp= otpInput.value;
+  try { const res=await fetch('/verify-otp', {
+      method:'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email:verifiedEmail,otp})
+    });
+    const data=await res.json();
+    if(!res.ok){ errDiv.textContent=data.error || "Invalid OTP";
+      return;
+     }
+    errDiv.textContent= '';
+    regEmail.value=verifiedEmail;
+    otpDiv.style.display= "none";
+    registerDiv.style.display ="block";
+  } catch(err){
+    console.error(err);
+    errDiv.textContent = "Something went wrong.";
+  }
+});
+</script>
+
+</body>
+</html>

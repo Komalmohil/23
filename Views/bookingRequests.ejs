@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Document</title>
+  <link rel="stylesheet" href="/css/bookingstyle.css">
+</head>
+<body>
+  <%- include('partials/header.ejs') %>
+
+  <div class="box">
+    <h2>Booking Requests for:<%= ride.location %> - <%= ride.destination %></h2>
+
+    <% if (pendingBookings.length>0){ %>
+      <ul>
+        <% pendingBookings.forEach(booking=>{%>
+          <li class="card">
+            <strong><%= booking.name %></strong> wants to book
+            <%= booking.count%> seats.<br/>
+            Phone: <%= booking.phoneNo %><br>
+          <div class="btns">
+            <form action="/ride/<%= ride._id %>/booking/<%= booking._id %>/accept" method="POST" style="display:inline;">
+              <button type="submit">Accept</button>
+            </form>
+            <form action="/ride/<%= ride._id %>/booking/<%= booking._id %>/reject" method="POST" style="display:inline;">
+              <button type="submit">Reject</button>
+            </form></div>
+          </li><br/>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No pending booking requests.</p>
+    <% } %>
+  </div>
+</body>
+</html>

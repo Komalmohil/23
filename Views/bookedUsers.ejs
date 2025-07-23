@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" href="/css/bookingstyle.css">
+</head>
+<body>
+  <%- include('partials/header.ejs') %>
+
+  <div class="container">
+    <h1>Ride Bookings for: <%= ride.location %> → <%= ride.destination %></h1>
+
+    <% if (bookings.length>0) { %>
+      <ul class="ride-list">
+        <% bookings.forEach(booking => { %>
+          <li class="ride-item">
+            <strong><%= booking.userId.username %></strong><br>
+           <br/> <br/>Email: <%= booking.userId.email %><br>
+            <a href="/inbox/<%= ride._id %>/<%= booking.userId._id %>/<%= userId %>">Chat</a>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No accepted bookings yet.</p>
+    <% } %>
+  </div>
+</body>
+</html>
