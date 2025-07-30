@@ -1,111 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-   <link rel="stylesheet" href="/css/bookingstyle.css"> 
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ride Booking</title>
+  <link rel="stylesheet" href="/css/bookingstyle.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
+  <style>
+    #map { height: 300px; margin: 1em 0; }
+  </style>
 </head>
 <body>
-    <%- include('partials/header.ejs') %>
-<main>
-  <div class="container" id="bookdiv">
-  <h2> <%= ride.date %></h2>
-  <div class="details" id="locdest">
-          <h3>From: <%=ride.location%></h3>
-          <p>Pickup: <%= ride.pickupPoint%></p>
-          <p>At: <%= ride.pickupTime%></p>
-        <h3>To: <%=ride.destination %></h3>
-        <p>Drop-off: <%=ride.dropoffPoint %></p>
-  </div>
-  <div class="details" id="noCost"> 
-    <p><%= ride.seats %> passenger</p>
-    <p>Price: ₹<%= ride.price %></p>
-  </div>
-    <button type="button" id="book" onclick="showInput('<%= ride._id %>')">Book Ride</button>
-</div>
+  <%- include('partials/header.ejs') %>
+
+  <main>
+    <div class="container" id="bookdiv">
+      <h2><%= ride.date %></h2>
+      <div class="details" id="locdest">
+        <h3>From: <%= ride.location %></h3>
+        <p>Pickup: <%= ride.pickup.point %></p>
+        <p>At: <%= ride.pickupTime %></p>
+        <h3>To: <%= ride.destination %></h3>
+        <p>Drop-off: <%= ride.dropoff.point %></p>
+      </div>
+      <div class="details" id="noCost">
+        <p><%= ride.seats %> passenger</p>
+        <p>Price: ₹<%= ride.price %></p>
+      </div>
+      
+      <div id="map"></div> 
+
+      <button type="button" id="book" onclick="showInput()">Book Ride</button>
+    </div>
+
     <div id="namebox" style="display:none;">
       <h2>Route: <%= ride.location %> - <%= ride.destination %></h2>
+      <form id="bookingForm" onsubmit="submitForm(event)">
+        <input type="hidden" name="rideId" value="<%= ride._id %>">
+        <div class="select-group">
+          <h2>Booking for:</h2>
+          <select name="bookingFor" id="bookingFor" onchange="toggleForm()" required>
+            <option value="">Choose one</option>
+            <option value="myself">Myself</option>
+            <option value="other">Someone else</option>
+          </select>
 
-        <form id="bookingForm" onsubmit="submitForm(event)">
-    <input type="hidden" name="rideId" value="<%= ride._id %>">
-            <div class="select-group">
-                <h2>Booking for:</h2>
-                <select name="bookingFor" id="bookingFor" onchange="toggleForm()">
-                    <option value="">Choose one</option>
-                    <option value="myself">Myself</option>
-                    <option value="other">Someone else</option>
-                </select>
+          <div id="myselfForm" style="display: none;">
+            <input type="text" value="<%= username || '' %>" name="passengerName" placeholder="Your name">
+            <input type="number" name="passengersNo" max="<%= ride.seats %>" placeholder="Number of passengers">
+            <input type="tel" name="phoneNumber" pattern="[0-9]{10}" placeholder="Your contact number">
+          </div>
 
-                <div id="myselfForm" style="display: none;">
-                    <input type="text" value="<%= username||'' %>" name="passengerName" placeholder="Your name">
-                    <input type="number" name="passengersNo" max="<%=ride.seats%>" placeholder="Number of passengers">
-                    <input type="tel" name="phoneNumber" pattern="[0-9]{10}" placeholder="Your contact number">
-                </div>
-
-                <div id="otherForm" style="display: none;">
-                    <input type="text" name="otherPassengerName" placeholder="Passenger name">
-                    <input type="email" name="passengerEmail" placeholder="Passenger email">
-                    <input type="number" name="no" placeholder="Number of passengers">
-                    <input type="tel" name="phoneNo" pattern="[0-9]{10}" placeholder="Passenger contact number">
-                </div>
-            </div>
-            <button type="submit" id="confirm">Confirm Booking</button>
-            <div id="responseMessage" style="margin-top: 1em;"></div>
-        </form>
+          <div id="otherForm" style="display: none;">
+            <input type="text" name="otherPassengerName" placeholder="Passenger name">
+            <input type="email" name="passengerEmail" placeholder="Passenger email">
+            <input type="number" name="no" placeholder="Number of passengers">
+            <input type="tel" name="phoneNo" pattern="[0-9]{10}" placeholder="Passenger contact number">
+          </div>
+        </div>
+        <button type="submit" id="confirm">Confirm Booking</button>
+        <div id="responseMessage" style="margin-top: 1em; color: red;"></div>
+      </form>
     </div>
-</div>
+  </main>
 
-<script>
-const username = "<%= username||'' %>";
-function showInput(){
-    document.getElementById("namebox").style.display='block';
-    document.getElementById("bookdiv").style.display='none';
-}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  <script>
+    const username = "<%= username || '' %>";
 
+    function showInput() {
+      document.getElementById("namebox").style.display = 'block';
+      document.getElementById("bookdiv").style.display = 'none';
+    }
 
-function toggleForm() {
-  const bookingFor =document.querySelector('select[name="bookingFor"]').value;
-  const myselfForm=document.getElementById("myselfForm");
-  const otherForm= document.getElementById("otherForm");
+    function toggleForm() {
+      const bookingFor = document.querySelector('select[name="bookingFor"]').value;
+      document.getElementById("myselfForm").style.display = bookingFor === "myself" ? "block" : "none";
+      document.getElementById("otherForm").style.display = bookingFor === "other" ? "block" : "none";
+    }
 
-  myselfForm.style.display= bookingFor==="myself" ?"block" :"none";
-  otherForm.style.display=bookingFor==="other"?"block":"none";
+    async function submitForm(event) {
+      event.preventDefault();
+      const form = document.getElementById("bookingForm");
+      const errDiv = document.getElementById("responseMessage");
 
-}
+      const data = {
+        rideId: form.rideId.value,
+        bookingFor: form.bookingFor.value,
+        passengerName: form.passengerName?.value,
+        passengersNo: form.passengersNo?.value,
+        phoneNumber: form.phoneNumber?.value,
+        otherPassengerName: form.otherPassengerName?.value,
+        passengerEmail: form.passengerEmail?.value,
+        phoneNo: form.phoneNo?.value,
+        no: form.no?.value
+      };
 
-async function submitForm(event) {
-  event.preventDefault();
-  const form= document.getElementById("bookingForm");
-  const errDiv =document.getElementById("responseMessage")
-  const data = {
-    rideId:form.rideId.value,
-    bookingFor:form.bookingFor.value,
-    passengerName: form.passengerName?.value,
-    passengersNo:form.passengersNo?.value,
-    phoneNumber:form.phoneNumber?.value,
-    otherPassengerName: form.otherPassengerName?.value,
-    passengerEmail:form.passengerEmail?.value,
-    phoneNo: form.phoneNo?.value,
-    no:form.no?.value
-  };
-  try{
-    const res= await fetch("/book-ride", {
-      method:"POST",
-      headers:{ "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-    const data=await res.json();
-    errDiv.textContent= data.error || "Something went wrong.";
-    return;
-  }
-  else{ errDiv.textContent="Request sent";}
-  } catch(err){
-    console.error(err);
-    errDiv.textContent="Please login first";
-  }
-}
-</script>
+      try {
+        const res = await fetch("/book-ride", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(data),
+        });
+
+        let resData;
+        try {
+          resData = await res.json();
+        } catch (jsonErr) {
+          resData = { message: await res.text() };
+        }
+
+        if (!res.ok) {
+          errDiv.textContent = resData.error || resData.message || "Something went wrong.";
+        } else {
+          errDiv.style.color = "green";
+          errDiv.textContent = resData.message || "Request sent successfully!";
+          form.reset();
+        }
+      } catch (err) {
+        console.error(err);
+        errDiv.textContent = "Please login first.";
+      }
+    }
+    const pickupLat = "<%= ride.pickup.lat %>";
+    const pickupLng = "<%= ride.pickup.lng %>";
+    const dropoffLat = "<%= ride.dropoff.lat %>";
+    const dropoffLng = "<%= ride.dropoff.lng %>";
+
+    const map = L.map('map').setView([pickupLat, pickupLng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.Routing.control({
+      waypoints: [
+        L.latLng(pickupLat, pickupLng),
+        L.latLng(dropoffLat, dropoffLng)
+      ],
+      routeWhileDragging: false,
+      show: false,
+    }).addTo(map);
+  </script>
 </body>
 </html>

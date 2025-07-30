@@ -3,8 +3,8 @@ const User = require("../Models/User");
 const Notification=require("../Models/Notification")
 const userSockets = {};
 
-module.exports = (io) => {
-  io.on("connection", (socket) => {
+module.exports=(io)=>{
+  io.on("connection",(socket)=>{
     console.log(`Socket connected: ${socket.id}`);
 
     socket.on("registerUser",(userId)=>{
@@ -30,14 +30,13 @@ module.exports = (io) => {
       try {
         const message=await Message.create({text,sender,receiver,rideId });
 
-        io.to(roomId).emit("newMessage", message);
+        io.to(roomId).emit("newMessage",message);
       
         const senderUser=await User.findById(senderId).select("username");
         const senderName=senderUser?.username||"Someone";
 
-        await Notification.create({user: receiverId,message: `New message from ${senderName}`,rideId,isRead: false});
+        await Notification.create({user: receiverId,message: `New message from ${senderName}`,rideId,roomId,isRead: false});
         
-
         const receiverSocket=userSockets[receiverId];
         if(receiverSocket){
           console.log("Sending notification to receiver:",receiverId);
@@ -46,13 +45,18 @@ module.exports = (io) => {
             rideId,roomId,sender:senderId,receiver:receiverId
           });
         }
-
-      } catch (err) {
-        console.error("Message not stored:", err);
-      }
+      } catch(err){  console.error("Message not stored:", err); }
     });
 
-    socket.on("disconnect", () => {
+
+
+    // socket.on("send-loc",async(data)=>{
+    //    io.emit("receive-loc",{})
+    // }
+
+
+
+    socket.on("disconnect",()=>{
       console.log(`Socket disconnected: ${socket.id}`);
       if (socket.userId && userSockets[socket.userId] === socket) {
         delete userSockets[socket.userId];

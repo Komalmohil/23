@@ -7,6 +7,7 @@ const notificationSchema=new mongoose.Schema({
   user:{ type: Schema.Types.ObjectId,ref:'User',required:true},
   message:{ type: String, required: true },
   rideId:{ type: Schema.Types.ObjectId,ref:'Ride'},
+  roomId:{type:String, default:""},
   isRead:{type:Boolean, default:false}
 });
 

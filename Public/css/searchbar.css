@@ -1,0 +1,136 @@
+.search-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  margin: 0 auto 28px auto;
+  max-width: 820px;
+  padding: 14px 18px;
+  gap: 1.2rem;
+  position: relative;
+  top: -32px;        
+  z-index: -1;      
+}
+
+.search-input-group {
+  display: flex;
+  align-items: center;
+  background: #f4f8fb;
+  border-radius: 10px;
+  margin: 0 0.3rem;
+  padding: 0 16px;
+  min-width: 160px;
+  flex: 1 1 0;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgba(0,168,255,0.03);
+}
+.search-input-group:focus-within {
+  box-shadow: 0 2px 8px rgba(0,168,255,0.17);
+}
+
+.search-input-group input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1.09rem;
+  color: #222;
+  padding: 10px 7px;
+  min-width: 0;
+  width: 100%;
+}
+
+
+.search-btn {
+  padding: 0.82rem 2.1rem;
+  background: linear-gradient(90deg, #00aaff, #57d1fc 88%);
+  color: #fff;
+  border: none;
+  border-radius: 11px;
+  font-size: 1.13rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,168,255,0.12);
+  transition: background 0.23s, box-shadow 0.23s;
+}
+.search-btn:hover, .search-btn:focus {
+  box-shadow: 0 5px 16px rgba(0,168,255,0.18);
+}
+
+.box {
+  max-width: 900px;
+  margin-top: 10px;
+  margin-left:290px;
+  padding: 10px 15px;
+  font-family: Arial, sans-serif;
+  color: #222;
+}
+
+h1 {
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 12px;
+  color: #111;
+  padding-bottom: 6px;
+  margin-top: 50px;
+}
+
+#allrides {
+  margin-top: 20px;
+}
+
+.ride-list {
+   list-style: none;
+  /* padding: 10px 10px;  */
+  margin-left : 20px;
+  margin-right: 20px;
+}
+
+.ride-item {
+  background-color: #d5def7;    
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.25s ease;
+  cursor: pointer;
+}
+
+.ride-item:hover {
+  background-color: #c3d4f9;
+}
+
+.search-bar {
+  margin-top: 40px;
+  position: relative;
+  top: 0; 
+  transition: margin-top 0.3s ease;
+}
+
+.ride-item {
+  padding: 12px 15px;    
+  font-size: 0.9rem; 
+}
+.ride-item strong {
+  font-size: 1rem;     
+}
+
+.ride-item p {
+  font-size: 11px;     
+  margin: 0;            
+}
+
+#cost {
+  font-weight: 800;
+  color: #5497db;
+  min-width: 70px;
+  text-align: right;
+  font-size: 1.06rem;
+  margin-left: 15px;
+  user-select: none;
+}
+

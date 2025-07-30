@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+<style>
+#map { height: 600px; }
+</style>
+ 
+</head>
+
+<body>
+<h2>MAP</h2>
+<div id="map"></div>
+
+</body>
+<script>
+    var map = L.map('map');    
+    map.setView([29.0588, 76.0856], 10);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="/">BlaBlaCar</a>'
+}).addTo(map);
+
+navigator.geolocation.watchPosition(success,error,{
+    enableHighAccuracy:true, timeout:5000,maximunAge:0});
+ 
+ let marker,circle,zoomed=false;
+function success(pos){
+    const lat = pos.coords.latitude;
+    const long= pos.coords.longitude;
+    const accuracy = pos.coords.accuracy;
+  
+  if(marker){
+    map.removeLayer(marker);
+     map.removeLayer(circle);
+  }
+  marker= L.marker([lat,long]).addTo(map)
+  circle=L.circle([lat,long],{ radius:accuracy}).addTo(map)
+  
+  if(!zoomed){  
+    zoomed= map.fitBounds(circle.getBounds())  
+    zoomed=true;
+ }
+  map.setView([lat,long])
+}
+
+function error(err){
+    if(err.code===1){
+        console.log("err1")
+        alert("Pease allow geolocation access")
+    }else{
+        console.log("err2")
+        alert("Cannot get location")
+    }
+}
+
+</script>
+</html>

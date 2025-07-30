@@ -5,8 +5,8 @@ const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');   
 require('dotenv').config();
-const cookieParser = require('cookie-parser');
 const notification= require("./sockets/socket")
+const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -14,7 +14,6 @@ const server =createServer(app)
 const io= new Server(server)   //creating circuit
 app.set('io', io);
 notification(io)
-
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

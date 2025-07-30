@@ -1,0 +1,253 @@
+  body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f5f9fb;
+  color: #003840;
+}
+
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  font-weight: bold;
+  font-size: 1.8rem;
+  color: #006e90;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.details {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 18px;
+  margin-bottom: 20px;
+  color: #585a5c;
+}
+
+#locdest h3 {
+  margin: 0 0 8px 0;
+  color: #033969;
+}
+
+#locdest p {
+  margin: 4px 0 10px 4px;
+  font-size: 14px;
+}
+
+#noCost {
+  display: flex;
+  gap: 30px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  justify-content: flex-start;
+  color: #303030;
+}
+
+#book {
+  width: 100%;
+  background-color: #00a8e8;
+  color: #fff;
+  padding: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#book:hover {
+  background-color: #008ac6;
+}
+
+#namebox {
+  display: none;
+  max-width: 600px;
+  margin: 30px auto 60px;
+  background: #fff;
+  padding: 25px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+#namebox h2 {
+  font-weight: 700;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #006e90;
+}
+
+.select-group {
+  margin-bottom: 25px;
+}
+
+select, input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  margin: 10px 0;
+  box-sizing: border-box;
+}
+
+#myselfForm, #otherForm {
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 15px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#confirm {
+  width: 100%;
+  padding: 14px;
+  background-color: #00a8e8;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#confirm:hover {
+  background-color: #008ac6;
+}
+
+#responseMessage {
+  margin-top: 12px;
+  font-weight: 600;
+  color: #d63447;
+  text-align: center;
+  min-height: 1.3em;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #006e90;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #00a8e8;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.ride-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ride-item {
+  background-color: #f7fbff;
+  border-radius: 12px;
+  padding: 18px 22px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.ride-item:hover {
+  box-shadow: 0 7px 20px rgba(0,0,0,0.12);
+}
+
+.ride-item a {
+  color: #004f73;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+  flex: 1;
+  display: inline-block;
+}
+
+.ride-item a strong {
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.ride-item a br + text {
+  font-size: 0.95rem;
+  color: #5a6c7a;
+}
+
+.ride-item button {
+  background-color: #00a8e8;
+  border: none;
+  border-radius: 40px;
+  padding: 9px 18px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.ride-item button:hover {
+  background-color: #008ac6;
+}
+
+.ride-item button a.btn-view-requests {
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  display: block;
+}
+.box {
+  max-width: 600px;
+  margin: 40px auto 60px;
+  background-color: #fff;
+  padding: 30px 25px;
+  border-radius: 15px;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  color: #222;
+}
+
+.box h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #006e90;
+  margin-bottom: 28px;
+  text-align: center;
+  padding-bottom: 8px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card {
+  background: #f5faff;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  color: #003840;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.box p {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #666;
+  margin-top: 40px;
+}
+.btns {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}

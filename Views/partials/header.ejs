@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="/css/style.css">
   <title>Document</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
      <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <header class="navbar">
     <div class="left">
       <img src="https://logos-world.net/wp-content/uploads/2022/04/BlaBlaCar-Symbol.png" alt="logo" class="logo">
-      <span class="blabla"><a href="/">BlaBlaCar</a></span>
+      <a href="/"><span id="blabla">BlaBlaCar</span></a>
     </div>
 
     <div class="right">
-      <a href="/search">Search</a>
-      <a href="/publish">Publish a ride</a>
+      <a href="/search" class="link"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
+      <a href="/publish" class="link"><i class="fa-solid fa-plus"></i>Publish a ride</a>
 
       <div class="user-dropdown" onclick="toggleDropdown()">
         <img src="https://img.freepik.com/premium-vector/avatar-profile-icon_188544-4755.jpg" alt="User" class="profile">
@@ -23,7 +23,7 @@
           <span style="padding:10px;">Hi, <%=username%></span>   
           <a href="/booked-rides">Your Rides</a>
           <a href="/inbox">Inbox</a>
-          <a href="/profile">Profile</a>
+          <a href="/profile" class="droplink"><i class="fa-regular fa-user"></i>Profile</a>
           <a href="/published-rides">Published rides</a>
           <a href="/notification">Notifcations</a>
           <a href="/logout">Logout</a>

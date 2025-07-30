@@ -4,40 +4,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+<link rel="stylesheet" href="/css/searchbar.css">
 </head>
 <body>
-  <% if (notifications && notifications.length > 0) { %>
+  
+    <%- include('partials/header.ejs') %>
+    <main>
+  <div class="container">
+    <% if (notifications && notifications.length > 0) { %>
     <% notifications.forEach(n => { %>
       <div class="notification">
         <p><%= n.message %></p>
-        <% if (n.rideId) { %>
+
+        <% if (n.rideId && n.roomId === "") { %>
           <a class="view-link" href="/ride/<%= n.rideId._id %>/requests">View Ride</a>
+
+        <% } else if (n.rideId && n.roomId !== "") { %>
+          <a class="view-link" href="/inbox/<%= n.roomId%>">View Chat</a>
         <% } %>
       </div>
     <% }) %>
   <% } else { %>
     <p>No notifications.</p>
   <% } %>
+  </div>
+</main>
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
   socket.on("connect",()=>{
     const userId="<%= userId %>"; 
     if(userId){
-      socket.emit("registerUser", userId);
+      socket.emit("registerUser",userId);
     }
   });
 
-  socket.on("newChatNotification", ({message,rideId,sender,receiver })=>{
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <div style="background-color:#f5f5dc;padding:10px;margin:10px 0;">
-        <strong>${message}</strong><br>
-        <a href="/inbox/${rideId}/${sender}/${receiver}">View Chat</a>
-      </div>
-    `;
-    document.body.appendChild(div);
-  });
+ socket.on("newBookingRequest", (notification) => {
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <div style="background-color:#e6ffe6;padding:10px;margin:10px 0;border:1px solid #8bc34a;">
+      <strong>${notification.message}</strong><br>
+      <a href="/ride/${notification.rideId}/requests">View Ride</a>
+    </div>
+  `;
+  document.body.appendChild(div);
+});
+
 </script>
 
 

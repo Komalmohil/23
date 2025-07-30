@@ -40,10 +40,10 @@
   const input=document.getElementById("msg");
   const messagesDiv=document.getElementById("messages");
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit",(e)=>{
     e.preventDefault();
     const msg=input.value.trim();
-    if (msg&&senderId &&receiverId&&rideId) {
+    if (msg&&senderId &&receiverId&&rideId){
       socket.emit("sendMessage", {text:msg ,sender:senderId,receiver:receiverId,rideId});
       input.value= "";
     }

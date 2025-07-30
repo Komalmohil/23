@@ -1,0 +1,119 @@
+main{
+  font-family: Arial, sans-serif;
+ display: flex;
+ justify-content: center;
+}
+#map{
+    max-width: 500px;
+    max-height: 800px;
+}
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #003840;
+  text-align: center;
+  margin-bottom: 30px;
+}
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px 0;
+}
+
+.profile-card {
+  display: flex;
+  gap: 20px;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 500px;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profile-details h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.profile-details p {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #555;
+}
+
+main {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  justify-content: center;
+}
+
+#one, #two {
+  flex: 1 1 400px;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.ride-item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f1f9ff;
+  border-radius: 8px;
+}
+
+.container {
+  text-align: center;
+  padding: 1rem;
+}
+
+#map {
+  width: 80%;
+  max-width: 300px;
+  border-radius: 10px;
+  margin: 1rem 0;
+}
+.container p {
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+.fa-star {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.fa-star.checked {
+  color: gold;
+}
+
+
+.message{
+  background-color: beige;
+  width:24%;
+  padding: 10px;
+  margin:17px 12px;
+  border-radius: 10px;
+  border: 2px solid black;
+}
+.left{
+  float:left;
+  clear:both;
+}
+.right{
+  float:right;
+  clear:both;
+}

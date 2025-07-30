@@ -7,12 +7,12 @@ exports.renderRideForm=(req,res)=>{res.render('ride', { isLoggedIn:req.isLoggedI
 
 exports.createRide = async(req,res)=>{
 try {
-    const { location, destination,date,pickupPoint,dropoffPoint, pickupTime,seats,price,returnTrip,returnTripDone,later}= req.body;   
+    const { location, destination,date,pickupPoint,dropoffPoint, pickupTime,seats,price,returnTrip,returnTripDone,later,pickupLat,pickupLng,dropLat,dropLng}= req.body;   
 
     if(!location||!destination ||!date ||!pickupPoint||!dropoffPoint||!pickupTime ||!seats||!price) { return res.status(400).send("Incomplete ride details");}
 
-     console.log(pickupTime)
-     console.log(new Date().toISOString().slice(11,16))
+   //  console.log(pickupTime)
+     //console.log(new Date().toISOString().slice(11,16))
      
     const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
 
@@ -27,13 +27,15 @@ try {
 
     const ride=new Ride({
         publisher: req.userId,
-        location, destination,date,pickupPoint,dropoffPoint, pickupTime,seats,price,
+        location, destination,date,pickupTime,seats,price,
             returnTrip:returnTrip=== 'on',
            returnTripDone:returnTripDone==='on',
-            later: later==='on'
+            later: later==='on',
+           pickup: {point: pickupPoint,lat: pickupLat,lng: pickupLng},
+          dropoff: { point: dropoffPoint, lat: dropLat, lng: dropLng}
         });
         await ride.save();
-      res.status(200).send("Ride published succesfully")
+      res.redirect("/search")
     }catch(err){ console.error(err);
         res.status(500).send('Error creating ride'); }
 };
@@ -54,7 +56,11 @@ exports.getRideDetails = async (req, res) => {
 
 exports.bookRide = async (req, res) => {
   try{
-    const {rideId,passengerName,passengersNo,phoneNumber,otherPassengerName,passengerEmail,phoneNo,no,bookingFor } = req.body;
+    const {
+  rideId, passengerName,passengersNo, phoneNumber,
+  otherPassengerName,passengerEmail,phoneNo,no,bookingFor,
+  pickupLat, pickupLng, dropLat, dropLng
+} = req.body;
 
     if((bookingFor==="")) { return res.status(400).json({ error: "You need to select one option" }); }
     if((bookingFor==="myself" && (!passengerName||!passengersNo ||!phoneNumber))||(bookingFor ==="other" && (!otherPassengerName||!passengerEmail||!no||!phoneNo))) {
@@ -80,7 +86,14 @@ exports.bookRide = async (req, res) => {
     if ((!phoneRegex.test(Number(phone)))) { return res.status(400).json({ error: "Phone number must be exactly 10 digits" });}
 
     let bookedForUserId=null;
-    let email= (bookingFor==='myself'?req.userEmail:passengerEmail);
+    let email;
+if (bookingFor === 'myself') {
+  const user = await User.findById(req.userId).select("email");
+  if (!user) return res.status(404).json({ error: "User not found" });
+  email = user.email;
+} else {
+  email = passengerEmail;
+}
 
     if(bookingFor==='other') {
        const user=await User.findOne({email:passengerEmail });
@@ -94,11 +107,12 @@ exports.bookRide = async (req, res) => {
       phoneNo: bookingFor=== 'myself'?phoneNumber:phoneNo,
       email,bookedForUserId,
       bookingStatus: "pending",
+      pickupLat,pickupLng,dropLat,dropLng
     });
     await booking.save();
     ride.bookings.push(booking._id);
     await ride.save();
-res.send("Request sent")
+res.status(200).json({ message: "Request sent" });
 
 const io=req.app.get('io');
 const userSockets=io.userSockets;
@@ -130,18 +144,19 @@ exports.getAllRides= async(req,res)=>{
   }
 };
 
-exports.searchRides=async (req,res)=>{
+exports.searchRides = async (req, res) => {
   try {
-    const min =new Date().toISOString().slice(0,10);
-    const rides=await Ride.find();
-    const date=rides.filter(ride=>ride.date>=min);
-    const filtered=date.filter(ride=>ride.seats>0);
-    res.render('search',{ rides: filtered,isLoggedIn:req.isLoggedIn,username:req.username });
-  } catch(err){
-    console.error(err);
-    res.status(500).send('Search err');
+    const today = new Date().toISOString().slice(0, 10);
+    const allRides = await Ride.find();
+    const upcomingRides = allRides.filter(ride => ride.date >= today);
+    const availableRides = upcomingRides.filter(ride => ride.seats > 0);
+    res.render('search', {rides: availableRides,isLoggedIn: req.isLoggedIn,username: req.username    });
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).send('Search error');
   }
 };
+
 
 exports.getPublishedRides=async(req,res)=>{
   try {

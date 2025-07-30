@@ -1,96 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-     <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Publish Ride</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+  <link rel="stylesheet" href="/css/ride.css"> 
 </head>
 <body>
-    <%-include('partials/header.ejs')%>
-    <main>
-     <div class="container" id="create-ride">
-        <h1>Complete the details for your ride</h1>
-    <form class="ride-form" id="rideForm">
-        <label id="loc">Leaving from</label>
-        <input type="text" id ="loc" name="location" required>
+  <%- include("partials/header.ejs") %>
 
-        <label id="des">Going to</label>
-        <input type="text" id="des" name="destination" required>
+  <h1 class="centered-title">Complete the details for your ride</h1>
 
-        <label id="date">Travel Date</label>
-        <input type="date" id="date" name="date" required>
-
-        <label id="pickup">Pickup Point</label>
-        <input type="text" id="pickup" name="pickupPoint" required>
-
-        <label id="time">Pickup Time</label>
-        <input type="time" id="time" name="pickupTime" required>
-
-        <label id="drop">Drop-off Point</label>
-        <input type="text" id="drop" name="dropoffPoint" required>
-
-        <label id="seats">How many passengers can you take?</label>
-        <input type="number" id="seats" name="seats" min="1" required>
-
-        <label id="price">Price per seat (₹)</label>
-        <input type="number" id="price" name="price" required>
-
+  <div class="container">
+    <div class="form-section">
+      <form id="rideForm" method="POST" action="/create-ride">
         
-       <div class="checkbox-group">
-        <label id="returnTrip"><input type="checkbox" name="returnTrip" id="returnTrip"> Publish return ride as well</label>
-        <label id="returnTripDone"><input type="checkbox" name="returnTripDone" id="returnTripDone"> Published</label>
-        <label id="later"><input type="checkbox" name="later" id="later"> Later</label>
+        <div class="locDes" id="location-box">
+          <label>Leaving from</label>
+          <input type="text" id="location" name="location" autocomplete="off" required />
+          <div id="locSugg" class="autocomplete-suggestions hidden"></div>
         </div>
 
-  <button type="submit">Publish Ride</button>
-</form>
-</div>
-    </main>
-</body>
-<script>
-const date=document.getElementById("date")
-const min= new Date().toISOString().slice(0,10)
-date.setAttribute('min',min)
+        <div id="pickup-section" class="hidden">
+          <label>Pickup Point</label>
+          <input type="text" name="pickupPoint" id="pickupPoint" readonly required />
+          <input type="hidden" id="pickupLat" name="pickupLat" />
+          <input type="hidden" id="pickupLng" name="pickupLng" />
+        </div>
 
-const container=document.getElementById("create-ride")
-const form=document.getElementById("rideForm")
-form.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const data={
-    location: form.location.value,
-    destination: form.destination.value,
-    date: form.date.value,
-    pickupPoint:form.pickupPoint.value,
-    pickupTime:form.pickupTime.value,
-    dropoffPoint:form.dropoffPoint.value,
-    seats:form.seats.value,
-    price: form.price.value,
-    returnTrip:form.returnTrip.checked,
-    returnTripDone:form.returnTripDone.checked,
-    later:form.later.checked,
-  };
-   
-    if(document.getElementById("returnTrip").checked){ data.returnTrip=true;  } 
-    else if(document.getElementById("returnTripDone").checked){data.returnTripDone =true;} 
-    else if(document.getElementById("later").checked){ data.later=true; }
+        <div class="locDes hidden" id="destination-box">
+          <label>Going to</label>
+          <input type="text" id="destination" name="destination" autocomplete="off" required />
+          <div id="desSugg" class="autocomplete-suggestions hidden"></div>
+        </div>
+
+        <div class="hidden" id="dropoff-section">
+          <label>Drop-off Point</label>
+          <input type="text" name="dropoffPoint" id="dropoffPoint" readonly required />
+          <input type="hidden" id="dropLat" name="dropLat" />
+          <input type="hidden" id="dropLng" name="dropLng" />
+        </div>
+        
+       <div id="routeConfirm" class="hidden">
+  <h2 class="route-title">What is your route?</h2>
+  <div id="routeOptions" class="route-options"></div>
+</div>
+
+
+        <div class="hidden" id="otherfields">
+          <label>Travel Date</label>
+          <input type="date" name="date" required />
+
+          <label>Pickup Time</label>
+          <input type="time" name="pickupTime" required />
+
+          <label>Passengers</label>
+          <input type="number" name="seats" min="1" required />
+
+          <label>Price (₹)</label>
+          <input type="number" name="price" required />
+
+          <button type="submit">Publish Ride</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="map-section">
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+
+<script>
+    let map;
+    let pickupMarker, dropMarker;
+    let activeMarker= "pickup";
+let routingControl; 
+
+   async function geocode(query){
+      try {
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&q=${encodeURIComponent(query)}`);
+    if (!res.ok) throw new Error("Geocoding request failed");
+    const data=await res.json();
+    console.log("res obj",res," only json data",data)
+    return data;
+  } catch (err) {
+    console.error("Geocoding error:", err.message);
+    return [];
+  }
+    }
+    
+     function initMap(lat,lng){
+      if(!map){
+        map=L.map("map").setView([lat, lng], 13);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+      } else {
+        map.setView([lat, lng], 13);
+      }
+    }
+
+    function createDraggableMarker(lat,lng,onDragEnd){
+      const marker=L.marker([lat,lng],{draggable:true}).addTo(map);
+      marker.on("dragend",async()=>{
+        const pos=marker.getLatLng();
+        console.log("pos in marker",pos)
+        const address=await reverseGeocode(pos.lat,pos.lng);
+        onDragEnd(pos.lat,pos.lng,address);
+      });
+      return marker;
+    }
+
+    async function reverseGeocode(lat, lng) {
+      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const data=await res.json();
+      return data.display_name||"Unknown location";
+    }
+
+    function setupAutocomplete(inputId, suggestionBoxId,onSelect) {
+      const input=document.getElementById(inputId);
+      const box = document.getElementById(suggestionBoxId);
+      
+      input.addEventListener("input", async()=>{
+        const query=input.value.trim();
+        box.innerHTML="";
+        console.log(query)
+         if (query.length<3) { 
+          box.classList.add("hidden");
+          return; }
   try {
-    const response=await fetch("/create-ride", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(data),
+        const results= await geocode(query);
+        console.log("result of geoco",results)
+        results.forEach(result=>{
+          const div= document.createElement("div");
+          console.log("names",result.display_name)
+          div.textContent=result.display_name;
+          div.addEventListener("click",()=>{
+            input.value=result.display_name;
+            box.classList.add("hidden");
+            console.log("clicked",result);
+            onSelect(result);
+          }); 
+      box.appendChild(div);
+    });
+    box.classList.remove("hidden");
+  } catch (err) {
+    console.error("Geocoding error:", err);
+  }
+});
+}
+   
+setupAutocomplete("location", "locSugg",(result)=>{
+    console.log("res",result)
+      initMap(result.lat,result.lon);
+      if(pickupMarker) { map.removeLayer(pickupMarker);
+        return;
+       }
+
+      pickupMarker =createDraggableMarker(result.lat,result.lon,(lat,lng,address)=>{
+        document.getElementById("pickupPoint").value =address;
+        document.getElementById("pickupLat").value =lat;
+        document.getElementById("pickupLng").value=lng;
+
+        document.getElementById("destination-box").classList.remove("hidden");
+      });
+      document.getElementById("pickup-section").classList.remove("hidden");
     });
 
-const text=await response.text();
-    if(response.ok){  window.location.href="/search";} 
-    else {
-  const resultDiv=document.createElement("div");
-  resultDiv.textContent =text;
-  container.appendChild(resultDiv);
-}
-  } catch(err){console.error(err);}
+  setupAutocomplete("destination","desSugg", (result)=>{
+   map.setView([result.lat, result.lon],13);
+  if (dropMarker) {map.removeLayer(dropMarker);
+    return;
+  }
+
+  dropMarker = createDraggableMarker(result.lat,result.lon,(lat,lng,address)=>{
+    document.getElementById("dropoffPoint").value = address;
+    document.getElementById("dropLat").value=lat;
+    document.getElementById("dropLng").value=lng;
+
+    document.getElementById("otherfields").classList.remove("hidden");
+
+    const pickupLat =document.getElementById("pickupLat").value;
+    const pickupLng =document.getElementById("pickupLng").value;
+
+   if (pickupLat && pickupLng) {
+  if (routingControl) {
+    map.removeControl(routingControl);
+  }
+
+  routingControl=L.Routing.control({
+     waypoints: [  L.latLng(pickupLat, pickupLng), L.latLng(lat, lng)],
+     
+    router: new L.Routing.OSRMv1({
+    serviceUrl: 'https://router.project-osrm.org/route/v1',
+    alternatives: true
+  }),
+  showAlternatives: true,
+  routeWhileDragging:true,
+createMarker: () => null,
+}).addTo(map);
+   }
+   
+  let routes = [];
+
+routingControl.on('routesfound',(e)=>{
+  console.log("routes",e.routes)
+  const routes= e.routes;
+  const div=document.getElementById("routeOptions");
+  div.innerHTML= `<label><input type="radio" name="route" value="0"> Route 1</label><br>
+                  <label><input type="radio" name="route" value="1"> Route 2</label> `;
+  document.getElementById("routeConfirm").classList.remove("hidden");
 });
-
-
-</script>
+  });
+  document.getElementById("dropoff-section").classList.remove("hidden");
+});
+    
+  </script>
+</body>
 </html>

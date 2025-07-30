@@ -69,18 +69,21 @@ exports.submitRating =async(req,res)=>{
     res.status(500).send("Failed to update rating");
   }
 };
+
 exports.showInbox = async (req, res) => {
   const {rideId,receiverId,senderId}=req.params;
   console.log("in show inbox");
   console.log("Sender:", senderId);
-  console.log("Receiver:", receiverId);
+  console.log("Receiver:",receiverId);
   console.log("Ride:", rideId);
 
   try {
     const messages=await Message.find({ rideId,$or:[{sender:senderId,receiver:receiverId },{sender:receiverId,receiver:senderId }] });
     const roomId = [senderId,receiverId,rideId].sort().join("_");
+
     res.render("inbox",{messages,rideId,receiverId,senderId,roomId, 
       isLoggedIn: req.isLoggedIn, username: req.username  });
+      
   } catch(err){
     console.error(err);
     res.status(500).send("Error loading inbox");
@@ -96,4 +99,14 @@ exports.notify=async (req,res)=>{
     console.error(err);
     res.status(500).send("notify err");
   }
+};
+
+exports.getChat= async(req,res)=>{
+    const {roomId}=req.params;
+  const parts =roomId.split('_');
+  if (parts.length !==3) {return res.status(400).send('Invalid roomId');}
+
+  const [rideId,sender,receiver]=parts;
+
+  res.redirect(`/inbox/${rideId}/${sender}/${receiver}`);
 };
