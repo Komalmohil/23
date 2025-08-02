@@ -61,8 +61,7 @@
 
 .box {
   max-width: 900px;
-  margin-top: 10px;
-  margin-left:290px;
+  margin: 10px auto; 
   padding: 10px 15px;
   font-family: Arial, sans-serif;
   color: #222;

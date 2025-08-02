@@ -4,7 +4,7 @@ const verifyToken= require('../Middleware/verifyToken');
 const auth =require('../Middleware/authRoute');
 
 const {renderRideForm,createRide,getRideDetails,getSearched,bookRide,getAllRides,searchRides,
-    getPublishedRides,acceptBooking,rejectBooking,getBookingRequests,bookedUsers}=require('../controllers/rideController');
+    getPublishedRides,acceptBooking,rejectBooking,getBookingRequests,bookedUsers,getMyBookingRequests}=require('../controllers/rideController');
 
 router.get('/publish',auth,renderRideForm);
 router.get('/search',auth,searchRides);
@@ -21,5 +21,7 @@ router.post('/ride/:rideId/booking/:bookingId/accept',verifyToken,acceptBooking)
 router.post('/ride/:rideId/booking/:bookingId/reject',verifyToken,rejectBooking);
 
 router.get("/ride/:rideId/bookings",verifyToken,bookedUsers)
+router.get("/my-booking-requests",verifyToken,getMyBookingRequests);
+
 
 module.exports =router;

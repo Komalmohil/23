@@ -30,20 +30,5 @@
       <% } %>
     </div>
   </main>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket=io();
-    socket.emit('registerUser','<%=userId%>');
-
-    socket.on('newBookingRequest',(data)=>{
-      const div=document.createElement('div');
-      div.innerHTML=` <div style="background-color: #f5f5dc; padding: 10px; margin: 10px 0;">
-          <strong>${data.message}</strong><br>
-          <a href="/ride/${data.rideId}/requests">View Booking</a>
-        </div>`;
-      document.body.appendChild(div);
-    });
-  </script>
 </body>
 </html>

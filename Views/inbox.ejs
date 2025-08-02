@@ -3,23 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <title>Document</title>
+<style>
+
+#chat-container{
+ width:90%;
+ margin:20px;
+ padding:5px;
+ height:80%
+}
+ #messages {
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+  padding: 14px;
+  background: #fff9f9;
+}
+
+.msgs {
+  padding: 8px 12px;
+  border-radius: 12px;
+}
+
+.sent {
+  align-self:flex-end;
+  background-color: #f7e2cf;
+}
+
+.received {
+  align-self: flex-start;
+  background-color: #c9d9f9;
+}
+
+</style>
 </head>
 <body>
   <%- include("partials/header") %>
-
+ <h4>my id <%=senderId%></h4>
   <div id="chat-container">
-    <div id="messages">
-      <% messages.forEach(msg => { %>
-        <div class="msgs">
-          <%= msg.text %>
-        </div>
-      <% })%>
-    </div>
-   <form id="form">
-  <input id="msg" autocomplete="off" /><button>Send</button>
-</form>
+  <div id="messages">
+    <% messages.forEach(msg => { %>
+      <div class="msgs <%= (msg.sender).toString()===senderId?'sent':'received' %>">
+        <%= msg.text %> <%=(msg.sender).toString()===senderId?'true':'false' %>
+      </div>
+    <% }) %>
+  </div>
 
-<p>room id<%=roomId%><br>receiver <%= receiverId %><br>sender<%= senderId %> <br><%= rideId %></p>
+  <form id="form">
+    <input id="msg" autocomplete="off" /><button>Send</button>
+  </form>
+
+  <p>
+    room id <%= roomId %><br>
+    receiver <%= receiverId %><br>
+    sender <%= senderId %><br>
+    ride <%= rideId %>
+  </p>
+</div>
 
 </div>
 <script src="/socket.io/socket.io.js"></script>
@@ -29,6 +68,10 @@
   const receiverId ="<%= receiverId %>"; 
   const rideId="<%=rideId %>";
   const senderId="<%= senderId %>"; 
+
+console.log("senderid type",typeof(senderId))
+console.log("curr","new")
+
 
   socket.on("connect", () => {
     console.log("Socket connected in FE",socket.id);  

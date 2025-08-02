@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Booking Requests</title>
+  <link rel="stylesheet" href="/css/profilestyle.css" />
+</head>
+<body>
+  <%- include('partials/header.ejs') %>
+  <main>
+    <!-- <div id="container"> -->
+    <h2>My Booking Requests</h2>
+
+    <% if (bookings.length > 0) { %>
+      <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+          <tr>
+            <th>Ride Date</th>
+            <th>Status</th>
+            <th>Ride Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% bookings.forEach(booking => { %>
+            <tr>
+              <td><%= booking.rideId.date%></td>
+              <td><%= booking.bookingStatus %></td>
+              <td>
+                <a href="/ride/<%=booking.rideId._id %>" class="btn">View Ride</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p>No booking requests found.</p>
+    <% } %>
+    <!-- </div> -->
+</main>
+</body>
+</html>

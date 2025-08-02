@@ -36,6 +36,13 @@
         <label>Password:</label>
         <input type="password" name="password" placeholder="Password" required><br>
 
+        <label>Are you a driver? <input type="checkbox" id="isDriver" name="isDriver" value="true"> </label>
+        <div id="driverDetails" style="display: none;">
+          <input type="text" name="carModel" placeholder="Car Model">
+          <input type="text" name="licenseNumber" placeholder="License Number">
+          <input type="number" name="seatCapacity" placeholder="Seat Capacity">
+        </div>
+
         <button type="submit">Register</button>
       </form>
     </div>
@@ -94,6 +101,10 @@ otpForm.addEventListener('submit', async (e) => {
     console.error(err);
     errDiv.textContent = "Something went wrong.";
   }
+});
+
+document.getElementById('isDriver').addEventListener('change', function () {
+  document.getElementById('driverDetails').style.display=this.checked ?'block':'none';
 });
 </script>
 

@@ -17,11 +17,13 @@
         <p><%= n.message %></p>
 
         <% if (n.rideId && n.roomId === "") { %>
-          <a class="view-link" href="/ride/<%= n.rideId._id %>/requests">View Ride</a>
+          <a class="view-link" href="/notification/read/<%= n._id %>?to=/ride/<%=n.rideId._id %>/requests">View Ride</a>
 
-        <% } else if (n.rideId && n.roomId !== "") { %>
-          <a class="view-link" href="/inbox/<%= n.roomId%>">View Chat</a>
-        <% } %>
+        <% } else if (n.rideId &&n.roomId !== "") { %>
+          <a class="view-link" href="/notification/read/<%= n._id %>?to=/inbox/<%=n.roomId %>">View Chat</a>
+        <!-- <% } else { %>
+          <a class="view-link" href="/ride/<%=n.rideId%>">Check</a> -->
+          <%}%>
       </div>
     <% }) %>
   <% } else { %>

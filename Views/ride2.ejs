@@ -15,7 +15,7 @@
   <%- include('partials/header.ejs') %>
 
   <main>
-    <div class="container" id="detaildiv">
+    <div class="container" id="bookdiv">
       <h2><%= ride.date %></h2>
       <div class="details" id="locdest">
         <h3>From: <%= ride.location %></h3>
@@ -27,18 +27,16 @@
       <div class="details" id="noCost">
         <p><%= ride.seats %> passenger</p>
         <p>Price: ₹<%= ride.price %></p>
-        <a href="/inbox/<%= ride._id %>/<%= ride.publisher._id %>/<%= userId %>">Chat with Driver</a>
-        </div>
+      </div>
       
       <div id="map"></div> 
 
       <button type="button" id="book" onclick="showInput()">Book Ride</button>
     </div>
 
-    <div id="bookdiv" style="display:none;">
+    <div id="namebox" style="display:none;">
       <h2>Route: <%= ride.location %> - <%= ride.destination %></h2>
-      
-      <form id="bookingForm">
+      <form id="bookingForm" >
         <input type="hidden" name="rideId" value="<%= ride._id %>">
         <div class="select-group">
           <h2>Booking for:</h2>
@@ -62,7 +60,7 @@
           </div>
         </div>
         <button type="submit" id="confirm">Confirm Booking</button>
-        <div id="errMessage" style="margin-top: 1em; color: red;"></div>
+        <div id="responseMessage" style="margin-top: 1em; color: red;"></div>
       </form>
     </div>
   </main>
@@ -70,61 +68,59 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
   <script>
-    const username = "<%= username || '' %>";
+
+ const username = "<%= username||'' %>";
 
 function showInput(){
-   document.getElementById("bookdiv").style.display='block';
-  document.getElementById("detaildiv").style.display='none';
+    document.getElementById("namebox").style.display='block';
+    document.getElementById("bookdiv").style.display='none';
 }
 
 function toggleForm(){
-  const bookingFor= document.querySelector('select[name="bookingFor"]').value;
-  document.getElementById("myselfForm").style.display=bookingFor==="myself" ? "block":"none";
-  document.getElementById("otherForm").style.display=bookingFor=== "other" ? "block":"none";
+    const bookingFor= document.querySelector('select[name="bookingFor"]').value;
+    document.getElementById("myselfForm").style.display=bookingFor === "myself" ? "block" : "none";
+    document.getElementById("otherForm").style.display=bookingFor === "other" ? "block" : "none";
 }
 
-document.getElementById("bookingForm").addEventListener("submit",async(e)=>{
+document.getElementById("bookingForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const errDiv=document.getElementById("errMessage");
-  const formData=new FormData(e.target);
-  const data=Object.fromEntries(formData.entries());
+  const errorDiv = document.getElementById("errorMessage");
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
 
   try {
-    const res=await fetch("/book-ride", {
+    const res = await fetch("/book-ride", {
       method: "POST",
-      headers:{ "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    const result=await res.json();
-    console.log("Response:",result);
+    const result = await res.json();
+    console.log("Response:", result);
 
-    if (!res.ok){   
-      errDiv.textContent=result.error || "An error occurred.";
-    }
+    if (!res.ok){   errorDiv.textContent = result.error || "An error occurred.";}
     else{ errDiv.style.color = "green";
-    errDiv.textContent="Request sent!" }
+    errorDiv.textContent ="Request sent!" }
   }catch(err){
-    errDiv.textContent= "Network error. Try again.";
-    console.error("Error:",err); 
+    errorDiv.textContent = "Network error. Try again.";
+    console.error("Error:", err); 
   }
 });
 
-
-document.addEventListener("DOMContentLoaded",function(){
-  const pickupLat = "<%=ride.pickup.lat %>";
-  const pickupLng= "<%=ride.pickup.lng %>";
-  const dropoffLat="<%=ride.dropoff.lat %>";
-  const dropoffLng = "<%= ride.dropoff.lng %>";
-  const selectedRouteIndex="<%= ride.routeIndex %>"; 
+document.addEventListener("DOMContentLoaded", function() {
+const pickupLat = "<%=ride.pickup.lat %>";
+const pickupLng= "<%=ride.pickup.lng %>";
+const dropoffLat="<%=ride.dropoff.lat %>";
+const dropoffLng = "<%= ride.dropoff.lng %>";
+const selectedRouteIndex="<%= ride.routeIndex %>"; 
     
-    const map = L.map('map').setView([pickupLat, pickupLng], 13);
+const map = L.map('map').setView([pickupLat, pickupLng], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy;BlaBlaCar'
     }).addTo(map);
    
-   L.marker([pickupLat, pickupLng],{draggable:false}).addTo(map).bindPopup("Pickup Point");
-   L.marker([dropoffLat, dropoffLng],{draggable:false }).addTo(map).bindPopup("Drop-off Point");
+   L.marker([pickupLat,pickupLng],{draggable:false}).addTo(map).bindPopup("Pickup Point");
+   L.marker([dropoffLat,dropoffLng],{draggable:false }).addTo(map).bindPopup("Drop-off Point");
   
    const routingControl = L.Routing.control({
   waypoints: [
@@ -138,17 +134,17 @@ document.addEventListener("DOMContentLoaded",function(){
   createMarker: () => null
 }).addTo(map);
 
-routingControl.on('routesfound', function (e) {
-  const routes = e.routes;
-  console.log("Available Routes:", routes);
-  console.log("Stored Route Index:", selectedRouteIndex);
+routingControl.on('routesfound', function(e){
+  const routes=e.routes;
+  console.log("Available Routes:",routes);
+  console.log("Stored Route Index:",selectedRouteIndex);
 
-  if(selectedRouteIndex>= 0 && selectedRouteIndex < routes.length) {
+  if(selectedRouteIndex>= 0 && selectedRouteIndex<routes.length) {
     const selectedRoute =routes[selectedRouteIndex];
     const coords= selectedRoute.coordinates;
 
     if(coords&&coords.length>0) {
-      const polyline = L.polyline(coords, {color:'blue'}).addTo(map);
+      const polyline = L.polyline(coords,{color:'blue'}).addTo(map);
       map.fitBounds(polyline.getBounds());
     } else { console.log("Selected route has no coordinates.");}
   }

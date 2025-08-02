@@ -21,7 +21,8 @@ const rideSchema = new mongoose.Schema({
   returnTripId: { type: Schema.Types.ObjectId, ref: 'Ride' },
 
   pickup: { point: String, lat: Number, lng: Number},
-dropoff: { point: String,  lat: Number, lng: Number},
+  dropoff: { point: String,  lat: Number, lng: Number},
+ routeIndex: { type: Number, required: true },
 });
 
 module.exports = mongoose.model('Ride', rideSchema);

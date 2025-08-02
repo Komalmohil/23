@@ -1,14 +1,12 @@
  const mongoose = require('mongoose');
  const { Schema } = mongoose;
-const User =require('./User');
-const Ride=require('./Ride');
 
  const bookingSchema=new mongoose.Schema(
     {
     rideId: { type: Schema.Types.ObjectId, ref:'Ride',required:true},      
     userId:{ type: Schema.Types.ObjectId,ref:'User',required:true},
     
-    username: {type:String,required: true},
+   // username: {type:String,required: true},
     
     bookingFor: {type:String, enum:["myself","other"],required: true  },
     

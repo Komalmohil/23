@@ -6,8 +6,7 @@ const userSchema =new mongoose.Schema({
   email: {type:String,required: true  },  
   phone:{type:Number,required: true  },  
   resetToken:{type:String, default:"" },  
-//   otp: {type:String, default:"" },
-// otpExpires: {type:Date, default:"" },
+  isDriver:{type:Boolean,default:false}
 });
 
 module.exports = mongoose.model('User', userSchema);

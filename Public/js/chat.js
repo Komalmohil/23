@@ -13,6 +13,5 @@ io.on("connection",(socket)=>{
     socket.broadcast.emit('received',{msg:msg,name:users[socket.id]})
  })
 
-
 })
 }

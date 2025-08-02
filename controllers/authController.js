@@ -3,6 +3,7 @@ const jwt= require('jsonwebtoken');
 const bcrypt =require('bcrypt');
 const sendMail= require('../Middleware/sendMail');
 const Otp = require('../Models/Otp');
+const Driver= require('../Models/Driver');
 const { v4:uuidv4 }= require('uuid');
 
 exports.Home=(req,res)=>{ res.render('home', {isLoggedIn:false||req.isLoggedIn, username:null||req.username,userId: req.userId||null });};
@@ -76,7 +77,7 @@ exports.renderSignup=(req,res)=>{ res.render("signup"); };
 
 exports.signup=async (req,res)=>{
   try {
-    const { name, email,password,phone}=req.body;
+    const { name, email,password,phone,isDriver, carModel,licenseNumber,seatCapacity}=req.body;
      console.log("email",email)
     if(!name||!email||!password||!phone){  return res.status(400).json({error:"incomplete details"})}
 
@@ -88,8 +89,17 @@ exports.signup=async (req,res)=>{
    }
 
     const hashedPassword= await bcrypt.hash(password,10);
-    const user=new User({ username: name,email,password:hashedPassword,phone });
+    const user=new User({ username: name,email,password:hashedPassword,phone,  isDriver });
     await user.save();
+    
+    console.log("driver radio",isDriver,typeof(isDriver))
+
+    if(isDriver==='true') {
+ if(!carModel||!licenseNumber||!seatCapacity){  return res.status(400).json({error:"incomplete details"})}
+     const driver= new Driver({user: user._id, carModel,licenseNumber,seatCapacity});
+      await driver.save();
+}
+
 
     const token=jwt.sign({id: user._id,username: user.username},process.env.secretKey,{ expiresIn: '1d' });
     res.cookie('token', token,{httpOnly: true,maxAge:100000000 });

@@ -2,6 +2,7 @@ const Message=require("../Models/Message");
 const Booking = require('../Models/Booking');
 const Ride = require('../Models/Ride');
 const User = require('../Models/User');
+const Driver = require('../Models/Driver');
 const Notification = require('../Models/Notification'); 
 
 exports.getBookedRides =async(req,res)=>{
@@ -46,10 +47,39 @@ exports.getBookedRides =async(req,res)=>{
 exports.getUserProfile=async (req,res)=>{
   try {
     const user=await User.findById(req.userId);
-    res.render('profile',{user,isLoggedIn: req.isLoggedIn,username: req.username,userId: req.userId});
+    let driver = null;
+    if (user && user.isDriver) {driver = await Driver.findOne({ user: user._id }); }
+    res.render('profile',{user,driver,isLoggedIn: req.isLoggedIn,username: req.username,userId: req.userId});
   } catch(err){
     console.error(err);
     res.status(500).send("profile err");
+  }
+};
+
+
+exports.updateDriver=async (req,res)=>{
+  const {driverId,carModel,licenseNumber,seatCapacity }=req.body;
+
+  if(!carModel||!licenseNumber||!seatCapacity) {  return res.status(400).json({ error: "All fields are required" });}
+   if(isNaN(seatCapacity)||seatCapacity<=0){ return res.status(400).json({ error:"Seat capacity is not valid"})}
+  
+  try {
+    if(driverId){
+    await Driver.findByIdAndUpdate(driverId,{carModel,licenseNumber,seatCapacity});
+    res.redirect('/profile');
+    }
+    else{
+     const user= User.findById(req.userId)
+    if(!user){  res.status(500).send("User not found"); }
+    else{
+      await User.findByIdAndUpdate(req.userId,{isDriver:true});
+      const newDriver = new Driver({ user:req.userId,carModel,licenseNumber,seatCapacity});
+      await newDriver.save();
+      res.redirect("/profile")
+    }
+    }
+  } catch(err){ console.error(err);
+    res.status(500).send("Update failed");
   }
 };
 
@@ -79,7 +109,7 @@ exports.showInbox = async (req, res) => {
 
   try {
     const messages=await Message.find({ rideId,$or:[{sender:senderId,receiver:receiverId },{sender:receiverId,receiver:senderId }] });
-    const roomId = [senderId,receiverId,rideId].sort().join("_");
+    const roomId=[senderId,receiverId,rideId].sort().join("_");
 
     res.render("inbox",{messages,rideId,receiverId,senderId,roomId, 
       isLoggedIn: req.isLoggedIn, username: req.username  });
@@ -93,12 +123,22 @@ exports.showInbox = async (req, res) => {
 
 exports.notify=async (req,res)=>{
   try {
-    const notifications=await Notification.find({ user:req.userId })
+    const notifications=await Notification.find({ user:req.userId,isRead:false })
     res.render('notifications',{notifications,isLoggedIn: req.isLoggedIn,username: req.username,userId: req.userId });
   } catch(err){
     console.error(err);
     res.status(500).send("notify err");
   }
+};
+
+exports.read=async (req,res) => {
+  const n_Id=req.params.id;        
+  const redirectTo=req.query.to;       
+  try { 
+    await Notification.findByIdAndUpdate(n_Id, {isRead:true, readAt:new Date()});
+    res.redirect(redirectTo);                   
+  } catch(err){res.status(500).send("Error");
+ }
 };
 
 exports.getChat= async(req,res)=>{
@@ -110,3 +150,4 @@ exports.getChat= async(req,res)=>{
 
   res.redirect(`/inbox/${rideId}/${sender}/${receiver}`);
 };
+

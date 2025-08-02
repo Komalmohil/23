@@ -4,20 +4,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>User Profile</title>
-  <link rel="stylesheet" href="/css/profilestyle.css" />
+ <link rel="stylesheet" href="/css/profilestyle.css" />
 </head>
 <body>
   <%- include('partials/header.ejs') %>
   <main>
     <div class="profile-container">
-      <div class="profile-card">
-        <div class="profile-details">
-          <h2><%= user.username %></h2>
-          <p><strong>Email:</strong> <%= user.email %></p>
-          <p><strong>Phone:</strong> <%= user.phone%></p>
-        </div>
-      </div>
+      <div class="section">
+        <h2><%= user.username %>'s Profile</h2>
+        <p><strong>Email:</strong> <%= user.email %></p>
+        <p><strong>Phone:</strong> <%= user.phone %></p>
+        <p><strong>User Type:</strong> <%= user.isDriver ?"Driver":"Passenger"%></p>
+      
+
+      <% if (user.isDriver&&driver) { %>
+  <div class="section">
+    <h3>Your Car Details</h3>
+    
+    <div id="carDetailsView">
+      <p><strong>Car Model:</strong> <%= driver.carModel %></p>
+      <p><strong>License Number:</strong> <%= driver.licenseNumber %></p>
+      <p><strong>Seat Capacity:</strong> <%= driver.seatCapacity %></p>
+      <button id="editBtn" class="btn">Edit Car Details</button>
+    </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <a href="/my-booking-requests" class="btn">My Booking Requests</a>
+</div>
+
+
+    <form id="editForm" action="/driver" method="POST" style="display: none;">
+      <input type="hidden" name="driverId" value="<%=driver._id %>"/>
+      <label>Car Model:</label>
+        <input type="text" name="carModel" value="<%=driver.carModel%>" required/>
+      <label>License Number:</label>
+        <input type="text" name="licenseNumber" value="<%= driver.licenseNumber %>" required/>
+      <label>Seat Capacity:</label>
+        <input type="number" name="seatCapacity" value="<%= driver.seatCapacity %>" required/>
+     
+      <button type="submit" class="btn">Save</button>
+      <button type="button" id="cancelBtn" class="btn" style="background-color: grey;">Cancel</button>
+    </form>
+  </div>
+<% } else {%>
+   <button id="bedriver" class="btn">Register as a driver</button>
+          <form id="newDriverForm" action="/driver" method="POST" style="display: none; margin-top:16px;">
+            <label>Car Model:</label>
+            <input type="text" name="carModel" required/>
+            <label>License Number:</label>
+            <input type="text" name="licenseNumber" required/>
+            <label>Seat Capacity:</label>
+            <input type="number" name="seatCapacity" required/>
+            <div style="margin-top:8px;">
+              <button type="submit" class="btn">Register</button>
+              <button type="button" id="cancelRegister" class="btn" style="background-color: grey;">Cancel</button>
+            </div>
+          </form>
+  <%}%>
     </div>
   </main>
+  
+  <script>
+  const editBtn=document.getElementById("editBtn");
+  const cancelBtn= document.getElementById("cancelBtn");
+  const form =document.getElementById("editForm");
+  const view= document.getElementById("carDetailsView");
+
+  if(editBtn){
+    editBtn.addEventListener("click", () => {
+      form.style.display= "block";
+      view.style.display= "none";
+    });
+  }
+
+  if(cancelBtn){
+    cancelBtn.addEventListener("click", () => {
+      form.style.display="none";
+      view.style.display= "block";
+    });
+  }
+
+const beDriverBtn=document.getElementById("bedriver");
+const registerForm=document.getElementById("newDriverForm");
+const cancelRegister=document.getElementById("cancelRegister");
+
+if(beDriverBtn){
+  beDriverBtn.addEventListener("click",()=>{
+  registerForm.style.display="block";
+  beDriverBtn.style.display="none";
+  });
+}
+
+if(cancelRegister){
+  cancelRegister.addEventListener("click",()=>{
+  registerForm.style.display="none";
+  beDriverBtn.style.display = "inline-block";
+  });
+}
+
+</script>
 </body>
 </html>
